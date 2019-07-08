@@ -1,2 +1,0 @@
-# CookBook
-Cookbook (spring + reactjs)

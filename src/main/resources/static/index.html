@@ -1,0 +1,25 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>The HTML5 Herald</title>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <script>
+    console.log('auth')
+    axios({
+        method:'get',
+        url:'/rest/recipe',
+        auth: {
+            username: 'user',
+            password: '123'
+        }
+    }).then(res => console.log(res.data));
+  </script>
+</body>
+</html>

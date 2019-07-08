@@ -1,20 +1,23 @@
 package com.bolilyivs.cookbook.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Table
-@ToString(of={"title", "description"})
-@EqualsAndHashCode(of = {"id"})
+@ToString(of={"id","title"})
+@EqualsAndHashCode(of = {"title"})
 public class Tag {
 
     @Getter
     @Setter
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Getter
@@ -23,10 +26,13 @@ public class Tag {
 
     @Getter
     @Setter
-    private String description;
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "tags")
+    @JsonIgnore
+    private Set<Recipe> recipes;
 
-    @Getter
-    @Setter
-    @ManyToMany(mappedBy = "tags")
-    private Collection<Recipe> recipes;
+    public Tag(){};
+
+    public Tag(String title){
+        this.title =title;
+    };
 }

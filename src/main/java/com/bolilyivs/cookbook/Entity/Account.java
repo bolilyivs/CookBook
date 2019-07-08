@@ -14,7 +14,7 @@ public class Account {
     @Getter
     @Setter
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Getter
@@ -27,4 +27,15 @@ public class Account {
 
     @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
     private Collection<Recipe> recipes;
+
+    public Account() {}
+
+    public Account(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public Account(String username) {
+        this.username = username;
+    }
 }
