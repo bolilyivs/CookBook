@@ -7,9 +7,9 @@ import java.util.Collection;
 
 @Entity
 @Table
-@ToString(of={"title"})
-@EqualsAndHashCode(of = {"title"})
-public class IngredientTitle {
+@ToString(of={"name"})
+@EqualsAndHashCode(of = {"name"})
+public class IngredientName {
 
     @Getter
     @Setter
@@ -19,5 +19,12 @@ public class IngredientTitle {
 
     @Getter
     @Setter
-    private String title;
+    private String name;
+
+    public IngredientName(String name) {
+        this.name = name;
+    }
+
+    public IngredientName() {
+    }
 }

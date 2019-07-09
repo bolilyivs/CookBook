@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -59,28 +61,26 @@ public class RecipeController {
         recipeList = recipeRepo.searchAllTitleUsernameTagsIngredients(finder.title,finder.username,
                 finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size(),
                 PageRequest.of(0, 10, Direction.DESC, "rating"));
-        for (Recipe recipe: recipeList) {
-            recipe.getIngredients().remove(new Ingredient("all", "all"));
-        }
         return recipeList;
     }
 
     @GetMapping("{id}")
     public Recipe getOne(@PathVariable("id") Recipe recipe){
-        recipe.getIngredients().remove(new Ingredient("all", "all"));
         return recipe;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public Recipe create(@RequestBody Recipe recipe){
-        recipe.setAccount(accountRepo.findByUsername("user1"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        recipe.setAccount(accountRepo.findByUsername(auth.getName()));
         recipe.getIngredients().add(new Ingredient("all", "all"));
         recipe.getTags().add(new Tag("all"));
         System.out.println(recipe);
         return recipeRepo.save(recipe);
     }
 
-    @PutMapping("{id}/update")
+
+    @PutMapping("/update/{id}")
     public Recipe update(@PathVariable("id") Recipe recipeDB, @RequestBody Recipe recipe){
         System.out.println(recipeDB);
         recipeDB.setTitle(recipe.getTitle());
@@ -95,7 +95,19 @@ public class RecipeController {
         return recipeRepo.save(recipeDB);
     }
 
-    @DeleteMapping("{id}/delete")
+    @GetMapping("/rating/plus/{id}")
+    public Recipe ratingPlus(@PathVariable("id") Recipe recipe){
+        recipe.setRating(recipe.getRating()+1);
+        return recipeRepo.save(recipe);
+    }
+
+    @GetMapping("/rating/minus/{id}")
+    public Recipe ratingMinus(@PathVariable("id") Recipe recipe){
+        recipe.setRating(recipe.getRating()-1);
+        return recipeRepo.save(recipe);
+    }
+
+    @DeleteMapping("delete/{id}")
     public void delete(@PathVariable("id") Recipe recipe){
         recipeRepo.delete(recipe);
     }

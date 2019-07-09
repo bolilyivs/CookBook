@@ -46,7 +46,7 @@ public class Recipe {
 
     @Getter
     @Setter
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "ACCOUNT_ID")
     private Account account;
 

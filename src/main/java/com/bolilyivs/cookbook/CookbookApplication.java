@@ -1,6 +1,7 @@
 package com.bolilyivs.cookbook;
 
 import com.bolilyivs.cookbook.Entity.Account;
+import com.bolilyivs.cookbook.Entity.Role;
 import com.bolilyivs.cookbook.Repo.AccountRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
