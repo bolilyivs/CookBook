@@ -2,6 +2,7 @@ package com.bolilyivs.cookbook.Entity;
 
 import lombok.*;
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,6 +54,9 @@ public class Recipe {
     @Getter
     @Setter
     private Long rating;
+
+    @OneToMany(mappedBy = "recipe")
+    private Collection<RecipeRating> recipesRating;
 
     public Recipe(Long id, String title, String description, Set<Ingredient> ingredients, Set<Tag> tags, Account account, Long rating) {
         this.id = id;

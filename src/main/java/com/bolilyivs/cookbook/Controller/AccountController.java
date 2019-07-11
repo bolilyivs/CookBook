@@ -30,6 +30,7 @@ public class AccountController {
 
     @PostMapping
     public Account create(@RequestBody Account user){
+        user.setRoles(new String[]{"ROLE_USER"});
         return accountRepo.save(user);
     }
 

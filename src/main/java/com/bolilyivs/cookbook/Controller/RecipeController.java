@@ -1,17 +1,8 @@
 package com.bolilyivs.cookbook.Controller;
 
-import com.bolilyivs.cookbook.Entity.Ingredient;
-import com.bolilyivs.cookbook.Entity.Recipe;
-import com.bolilyivs.cookbook.Entity.Account;
-import com.bolilyivs.cookbook.Entity.Tag;
-import com.bolilyivs.cookbook.JSON.IngredientJSON;
+import com.bolilyivs.cookbook.Entity.*;
 import com.bolilyivs.cookbook.JSON.RecipeFinder;
-import com.bolilyivs.cookbook.JSON.RecipeJSON;
-import com.bolilyivs.cookbook.Repo.AccountRepo;
-import com.bolilyivs.cookbook.Repo.IngredientRepo;
-import com.bolilyivs.cookbook.Repo.RecipeRepo;
-import com.bolilyivs.cookbook.Repo.TagRepo;
-import org.springframework.beans.BeanUtils;
+import com.bolilyivs.cookbook.Repo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -20,8 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 
@@ -39,11 +28,15 @@ public class RecipeController {
     private final AccountRepo accountRepo;
 
     @Autowired
-    public RecipeController(RecipeRepo recipeRepo, TagRepo tagRepo, IngredientRepo ingredientRepo, AccountRepo accountRepo) {
+    private final RecipeRatingRepo recipeRatingRepo;
+
+    @Autowired
+    public RecipeController(RecipeRepo recipeRepo, TagRepo tagRepo, IngredientRepo ingredientRepo, AccountRepo accountRepo, RecipeRatingRepo recipeRatingRepo) {
         this.recipeRepo = recipeRepo;
         this.tagRepo = tagRepo;
         this.ingredientRepo = ingredientRepo;
         this.accountRepo = accountRepo;
+        this.recipeRatingRepo = recipeRatingRepo;
     }
 
     @GetMapping
@@ -82,27 +75,67 @@ public class RecipeController {
 
     @PutMapping("/update/{id}")
     public Recipe update(@PathVariable("id") Recipe recipeDB, @RequestBody Recipe recipe){
-        System.out.println(recipeDB);
+        recipeRepo.save(recipeDB);
         recipeDB.setTitle(recipe.getTitle());
         recipeDB.setDescription(recipe.getDescription());
         recipeDB.setIngredients(recipe.getIngredients());
         recipeDB.setTags(recipe.getTags());
-
-        recipeDB.getIngredients().add(new Ingredient("all", "all"));
-        recipeDB.getTags().add(new Tag("all"));
-
         System.out.println(recipeDB);
         return recipeRepo.save(recipeDB);
     }
 
     @GetMapping("/rating/plus/{id}")
     public Recipe ratingPlus(@PathVariable("id") Recipe recipe){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Account account = accountRepo.findByUsername(auth.getName());
+
+        System.out.println("test " + account.getUsername());
+
+        if(recipeRatingRepo.existsByAccountAndRecipe(account, recipe)){
+            RecipeRating rating = recipeRatingRepo.findByAccountAndRecipe(account, recipe);
+            System.out.println(rating + " " + account);
+            if(rating.getRating() == -1){
+                rating.setRating((short) 1);
+                recipe.setRating(recipe.getRating()+2);
+            }else if(rating.getRating() == 1){
+                rating.setRating((short)0);
+                recipe.setRating(recipe.getRating()-1);
+            }else{
+                rating.setRating((short) 1);
+                recipe.setRating(recipe.getRating()+1);
+            }
+            recipeRatingRepo.save(rating);
+            return recipeRepo.save(recipe);
+        }
+
+        recipeRatingRepo.save(new RecipeRating(account, recipe, (short)+1));
         recipe.setRating(recipe.getRating()+1);
         return recipeRepo.save(recipe);
     }
 
     @GetMapping("/rating/minus/{id}")
     public Recipe ratingMinus(@PathVariable("id") Recipe recipe){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Account account = accountRepo.findByUsername(auth.getName());
+
+        if(recipeRatingRepo.existsByAccountAndRecipe(account, recipe)){
+            RecipeRating rating = recipeRatingRepo.findByAccountAndRecipe(account, recipe);
+            if(rating.getRating() == -1){
+                rating.setRating((short)0);
+                recipe.setRating(recipe.getRating()+1);
+            }else if(rating.getRating() == 1){
+                rating.setRating((short)-1);
+                recipe.setRating(recipe.getRating()-2);
+            }else{
+                rating.setRating((short)-1);
+                recipe.setRating(recipe.getRating()-1);
+            }
+
+            recipeRatingRepo.save(rating);
+            return recipeRepo.save(recipe);
+        }
+
+        recipeRatingRepo.save(new RecipeRating(account, recipe, (short)+1));
         recipe.setRating(recipe.getRating()-1);
         return recipeRepo.save(recipe);
     }
