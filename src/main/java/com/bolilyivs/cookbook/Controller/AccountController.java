@@ -4,6 +4,8 @@ import com.bolilyivs.cookbook.Entity.Account;
 import com.bolilyivs.cookbook.Repo.AccountRepo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +30,15 @@ public class AccountController {
         return user;
     }
 
+    @GetMapping("/login")
+    public Account login(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Account account = accountRepo.findByUsername(auth.getName());
+        return account;
+    }
+
     @PostMapping
-    public Account create(@RequestBody Account user){
+    public Account registration(@RequestBody Account user){
         user.setRoles(new String[]{"ROLE_USER"});
         return accountRepo.save(user);
     }

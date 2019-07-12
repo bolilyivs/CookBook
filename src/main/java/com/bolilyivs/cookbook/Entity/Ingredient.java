@@ -32,7 +32,7 @@ public class Ingredient {
 
     @Getter
     @Setter
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "ingredients")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "ingredients")
     @JsonIgnore
     private Set<Recipe> recipes;
 

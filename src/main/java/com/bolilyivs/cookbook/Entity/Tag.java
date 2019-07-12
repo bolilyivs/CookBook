@@ -26,7 +26,7 @@ public class Tag {
 
     @Getter
     @Setter
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "tags")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
     @JsonIgnore
     private Set<Recipe> recipes;
 

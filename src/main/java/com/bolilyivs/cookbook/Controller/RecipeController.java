@@ -46,19 +46,37 @@ public class RecipeController {
     }
 
     @PostMapping(path = "/find")
-    public List<Recipe> getByTags(@RequestBody RecipeFinder finder){
+    public List<Recipe> find(@RequestBody RecipeFinder finder){
+        System.out.println(finder);
         List<Recipe> recipeList;
         System.out.println(finder.title);
         finder.tags.add("all");
         finder.ingredients.add("all");
         recipeList = recipeRepo.searchAllTitleUsernameTagsIngredients(finder.title,finder.username,
                 finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size(),
-                PageRequest.of(0, 10, Direction.DESC, "rating"));
+                PageRequest.of(finder.page, finder.size, Direction.DESC, "rating"));
+        recipeList.forEach((recipe -> {
+            recipe.getTags().remove(new Tag("all"));
+            recipe.getIngredients().remove(new Ingredient("all", "all"));
+        }));
+
         return recipeList;
     }
 
+    @PostMapping(path = "/find/count")
+    public Long count(@RequestBody RecipeFinder finder){
+        System.out.println(finder.title);
+        finder.tags.add("all");
+        finder.ingredients.add("all");
+        return recipeRepo.countTitleUsernameTagsIngredients(finder.title,finder.username,
+                finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size());
+    }
+
+
     @GetMapping("{id}")
     public Recipe getOne(@PathVariable("id") Recipe recipe){
+        recipe.getTags().remove(new Tag("all"));
+        recipe.getIngredients().remove(new Ingredient("all", "all"));
         return recipe;
     }
 
@@ -80,6 +98,8 @@ public class RecipeController {
         recipeDB.setDescription(recipe.getDescription());
         recipeDB.setIngredients(recipe.getIngredients());
         recipeDB.setTags(recipe.getTags());
+        recipeDB.getIngredients().add(new Ingredient("all", "all"));
+        recipeDB.getTags().add(new Tag("all"));
         System.out.println(recipeDB);
         return recipeRepo.save(recipeDB);
     }
