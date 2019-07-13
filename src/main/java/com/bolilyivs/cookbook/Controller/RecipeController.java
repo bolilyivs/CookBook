@@ -49,7 +49,6 @@ public class RecipeController {
     public List<Recipe> find(@RequestBody RecipeFinder finder){
         System.out.println(finder);
         List<Recipe> recipeList;
-        System.out.println(finder.title);
         finder.tags.add("all");
         finder.ingredients.add("all");
         recipeList = recipeRepo.searchAllTitleUsernameTagsIngredients(finder.title,finder.username,
@@ -65,11 +64,13 @@ public class RecipeController {
 
     @PostMapping(path = "/find/count")
     public Long count(@RequestBody RecipeFinder finder){
-        System.out.println(finder.title);
+        System.out.println(finder);
         finder.tags.add("all");
         finder.ingredients.add("all");
-        return recipeRepo.countTitleUsernameTagsIngredients(finder.title,finder.username,
+        long count = recipeRepo.countTitleUsernameTagsIngredients(finder.title,finder.username,
                 finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size());
+        System.out.println(count);
+        return count;
     }
 
 

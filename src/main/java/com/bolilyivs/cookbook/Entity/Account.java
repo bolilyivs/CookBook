@@ -12,7 +12,7 @@ import java.util.Collection;
 
 @Entity
 @Table
-@ToString(of={"username"})
+@ToString(of={"id","username", "email", "roles"})
 @EqualsAndHashCode(of = {"id"})
 public class Account{
 
@@ -34,7 +34,6 @@ public class Account{
 
     @Getter
     @Setter
-    @JsonIgnore
     private String[] roles;
 
     @Getter

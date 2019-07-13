@@ -47,8 +47,9 @@ public class WebAppConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                 .authorizeRequests()
+                .antMatchers("/api/account/registration").permitAll()
                 .antMatchers("/api/recipe/*").hasRole("USER")
-                .antMatchers("/api/recipe/delete/*").hasRole("ADMIN")
+
                 .anyRequest()
                 .permitAll();
 

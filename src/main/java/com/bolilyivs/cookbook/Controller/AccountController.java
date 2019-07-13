@@ -37,8 +37,9 @@ public class AccountController {
         return account;
     }
 
-    @PostMapping
+    @PostMapping("/registration")
     public Account registration(@RequestBody Account user){
+        System.out.println(user);
         user.setRoles(new String[]{"ROLE_USER"});
         return accountRepo.save(user);
     }

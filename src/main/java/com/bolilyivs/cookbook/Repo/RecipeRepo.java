@@ -31,7 +31,8 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
             @Param("ings") Set<String> ings, @Param("ingsSize") Long ingsSize,
                                                        Pageable page);
 
-    @Query( "SELECT COUNT(r.id) FROM Recipe r " +
+    @Query( "SELECT COUNT(r) FROM Recipe r WHERE r IN (" +
+            "SELECT r FROM Recipe r " +
             "JOIN r.tags rt " +
             "JOIN r.account acc " +
             "JOIN r.ingredients ing " +
@@ -41,7 +42,7 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
             "AND acc.username LIKE CONCAT('%',:username,'%') " +
             "GROUP BY r.id " +
             "HAVING COUNT(DISTINCT rt.title)=:tagsSize " +
-            "AND COUNT(DISTINCT ing.title)=:ingsSize")
+            "AND COUNT(DISTINCT ing.title)=:ingsSize)")
     Long countTitleUsernameTagsIngredients(@Param("title")String title,
                                                        @Param("username") String username,
                                                        @Param("tags") Set<String> tags, @Param("tagsSize") Long tagSize,
