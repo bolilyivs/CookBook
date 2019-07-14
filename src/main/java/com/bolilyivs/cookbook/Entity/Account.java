@@ -39,10 +39,10 @@ public class Account{
     @Getter
     private String email;
 
-    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private Collection<Recipe> recipes;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
     private Collection<RecipeRating> recipesRating;
 
     public Account() {}
