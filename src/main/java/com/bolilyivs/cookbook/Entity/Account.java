@@ -24,6 +24,7 @@ public class Account{
 
     @Getter
     @Setter
+    @Column( unique=true)
     private String username;
 
     @Getter
@@ -37,6 +38,7 @@ public class Account{
     private String[] roles;
 
     @Getter
+    @Column( unique=true)
     private String email;
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
@@ -63,7 +65,15 @@ public class Account{
     public Account(String username, String password) {
         this.username = username;
         setPassword(password);
+        this.roles = new String[]{"ROLE_USER"};
+    }
+
+    public void makeAdmin(){
         this.roles = new String[]{"ROLE_USER", "ROLE_ADMIN"};
+    }
+
+    public void makeUser(){
+        this.roles = new String[]{"ROLE_USER"};
     }
 
     public Account(String username) {

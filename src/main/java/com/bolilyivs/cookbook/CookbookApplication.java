@@ -31,6 +31,7 @@ public class CookbookApplication implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) throws Exception {
 		Account user1 = new Account("user1", "123");
+		user1.makeAdmin();
 		accountRepo.save(user1);
 
 		tagNameRepo.save(new TagName("tag1"));

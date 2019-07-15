@@ -19,6 +19,7 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
             "JOIN r.account acc " +
             "JOIN r.ingredients ing " +
             "WHERE r.title LIKE CONCAT('%',:title,'%') " +
+            "AND r.hide = false " +
             "AND rt.title IN (:tags) " +
             "AND ing.title IN (:ings) " +
             "AND acc.username LIKE CONCAT('%',:username,'%') " +
@@ -31,12 +32,31 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
             @Param("ings") Set<String> ings, @Param("ingsSize") Long ingsSize,
                                                        Pageable page);
 
+    @Query( "SELECT r FROM Recipe r " +
+            "JOIN r.tags rt " +
+            "JOIN r.account acc " +
+            "JOIN r.ingredients ing " +
+            "WHERE r.title LIKE CONCAT('%',:title,'%') " +
+            "AND r.hide = true " +
+            "AND rt.title IN (:tags) " +
+            "AND ing.title IN (:ings) " +
+            "AND acc.username LIKE CONCAT('%',:username,'%') " +
+            "GROUP BY r.id " +
+            "HAVING COUNT(DISTINCT rt.title)=:tagsSize " +
+            "AND COUNT(DISTINCT ing.title)=:ingsSize")
+    List<Recipe> searchAllHideTitleUsernameTagsIngredients(@Param("title")String title,
+                                                       @Param("username") String username,
+                                                       @Param("tags") Set<String> tags, @Param("tagsSize") Long tagSize,
+                                                       @Param("ings") Set<String> ings, @Param("ingsSize") Long ingsSize,
+                                                       Pageable page);
+
     @Query( "SELECT COUNT(r) FROM Recipe r WHERE r IN (" +
             "SELECT r FROM Recipe r " +
             "JOIN r.tags rt " +
             "JOIN r.account acc " +
             "JOIN r.ingredients ing " +
             "WHERE r.title LIKE CONCAT('%',:title,'%') " +
+            "AND r.hide = false " +
             "AND rt.title IN (:tags) " +
             "AND ing.title IN (:ings) " +
             "AND acc.username LIKE CONCAT('%',:username,'%') " +
@@ -47,6 +67,24 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
                                                        @Param("username") String username,
                                                        @Param("tags") Set<String> tags, @Param("tagsSize") Long tagSize,
                                                        @Param("ings") Set<String> ings, @Param("ingsSize") Long ingsSize);
+
+    @Query( "SELECT COUNT(r) FROM Recipe r WHERE r IN (" +
+            "SELECT r FROM Recipe r " +
+            "JOIN r.tags rt " +
+            "JOIN r.account acc " +
+            "JOIN r.ingredients ing " +
+            "WHERE r.title LIKE CONCAT('%',:title,'%') " +
+            "AND r.hide = true " +
+            "AND rt.title IN (:tags) " +
+            "AND ing.title IN (:ings) " +
+            "AND acc.username LIKE CONCAT('%',:username,'%') " +
+            "GROUP BY r.id " +
+            "HAVING COUNT(DISTINCT rt.title)=:tagsSize " +
+            "AND COUNT(DISTINCT ing.title)=:ingsSize)")
+    Long countHideTitleUsernameTagsIngredients(@Param("title")String title,
+                                           @Param("username") String username,
+                                           @Param("tags") Set<String> tags, @Param("tagsSize") Long tagSize,
+                                           @Param("ings") Set<String> ings, @Param("ingsSize") Long ingsSize);
 
     Optional<Recipe> findByTitle(String title);
 

@@ -55,8 +55,22 @@ public class Recipe {
     @Setter
     private Long rating;
 
+    @Getter
+    @Setter
+    private Boolean hide = false;
+
     @OneToMany(mappedBy = "recipe", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Collection<RecipeRating> recipesRating;
+
+    public Recipe(String title, String description, Set<Ingredient> ingredients, Set<Tag> tags, Account account, Long rating, Boolean hide) {
+        this.title = title;
+        this.description = description;
+        this.ingredients = ingredients;
+        this.tags = tags;
+        this.account = account;
+        this.rating = rating;
+        this.hide = hide;
+    }
 
     public Recipe(Long id, String title, String description, Set<Ingredient> ingredients, Set<Tag> tags, Account account, Long rating) {
         this.id = id;

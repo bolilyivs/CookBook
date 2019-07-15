@@ -19,7 +19,21 @@ public class RecipeFinder {
     public int size = 10;
     public String sorting;
     public String sortingDir;
+    public Boolean hide = false;
 
+
+    public RecipeFinder(String title, String username, HashSet<String> tags, HashSet<String> ingredients,
+                        int page, int size, String sorting, String sortingDir, Boolean hide) {
+        this.title = title;
+        this.username = username;
+        this.tags = tags;
+        this.ingredients = ingredients;
+        this.page = page;
+        this.size = size;
+        this.sorting = sorting;
+        this.sortingDir = sortingDir;
+        this.hide = hide;
+    }
 
     public RecipeFinder(String username, HashSet<String> tags, HashSet<String> ingredients, int page,
                         int size, String sorting, String sortingDir) {

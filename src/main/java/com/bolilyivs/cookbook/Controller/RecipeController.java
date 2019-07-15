@@ -67,9 +67,15 @@ public class RecipeController {
 
         System.out.println(sorting + " " + dir);
 
-        recipeList = recipeRepo.searchAllTitleUsernameTagsIngredients(finder.title,finder.username,
-                finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size(),
-                PageRequest.of(finder.page, finder.size, dir, sorting));
+        if(finder.getHide()){
+            recipeList = recipeRepo.searchAllHideTitleUsernameTagsIngredients(finder.title,finder.username,
+                    finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size(),
+                    PageRequest.of(finder.page, finder.size, dir, sorting));
+        }else {
+            recipeList = recipeRepo.searchAllTitleUsernameTagsIngredients(finder.title,finder.username,
+                    finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size(),
+                    PageRequest.of(finder.page, finder.size, dir, sorting));
+        }
 
         recipeList.forEach((recipe -> {
             recipe.getTags().remove(new Tag("all"));
@@ -83,8 +89,15 @@ public class RecipeController {
     public Long count(@RequestBody RecipeFinder finder){
         finder.tags.add("all");
         finder.ingredients.add("all");
-        long count = recipeRepo.countTitleUsernameTagsIngredients(finder.title,finder.username,
-                finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size());
+        long count = 0;
+        if(finder.getHide()){
+            count = recipeRepo.countHideTitleUsernameTagsIngredients(finder.title,finder.username,
+                    finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size());
+        }else{
+            count = recipeRepo.countTitleUsernameTagsIngredients(finder.title,finder.username,
+                    finder.tags,(long) finder.tags.size(), finder.ingredients, (long) finder.ingredients.size());
+        }
+
         return count;
     }
 
@@ -185,12 +198,24 @@ public class RecipeController {
         return recipeRepo.save(recipe);
     }
 
+    @GetMapping("/hide/{id}")
+    public Recipe hide(@PathVariable("id") Recipe recipe){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if( auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            recipe.setHide(recipe.getHide()? false : true);
+            return recipeRepo.save(recipe);
+        }else{
+            throw new UsernameNotFoundException("Bad");
+        }
+    }
+
     @DeleteMapping("delete/{id}")
     public void delete(@PathVariable("id") Recipe recipe){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(recipe.getAccount().getUsername().equals(auth.getName()) ||
-                auth.getAuthorities().contains(auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")))
-        ){
+                auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        ) {
             recipeRepo.delete(recipe);
         }else{
             throw new UsernameNotFoundException("Bad");
